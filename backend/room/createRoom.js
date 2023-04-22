@@ -18,33 +18,47 @@ exports.handler = async (event, context, callback) => {
 		timeZone: "Asia/Bangkok",
 		timeZoneName: "short",
 	});
-	event.players = [];
+	event.players = [event.host];
 	event.players_score = {};
    	event.current_question = "";
 	event.question_list = ['Crab', 'Shirt'];
 	event.current_time = date;
 	event.room_status = "waiting";
-	// event.host = "player_id";
 	const res = admin.firestore().collection("room");
 	const newID = res.doc().id;
 	event.id = newID;
-	// event.room_num = newID;
 
-	const room = await res.where("room_num", '==', event.room_num).get();
-	if (room.empty) {
-		await res
-			.doc(newID)
-			.set(event)
-			.then(() => {
-				callback(null, {
-					statusCode: 200,
-					message: "Data added to firestore",
+	let isUnique = false;
+	let result = '';
+	while (!isUnique) {
+		// gen random string
+		result = generateRandomString();
+		console.log(result);
+		// query check result exists?
+		const room = await res.where("room_num", '==', result).get();
+		if (room.empty) {
+			isUnique = true;
+			event.room_num = result;
+			await res
+				.doc(newID)
+				.set(event)
+				.then(() => {
+					callback(null, {
+						statusCode: 200,
+						message: "Create room successfully",
+						room_num: result
+					});
 				});
-			});
-	} else {
-		callback(null, {
-			statusCode: 400,
-			message: "Room_num exists",
-		});
+		}
 	}
 };
+
+function generateRandomString() {
+	let result = '';
+	const characters = '0123456789';
+	const charactersLength = characters.length;
+	for (let i = 0; i < 4; i++) {
+	  result += characters.charAt(Math.floor(Math.random() * charactersLength));
+	}
+	return result;
+}

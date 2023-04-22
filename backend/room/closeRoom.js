@@ -8,14 +8,14 @@ admin.initializeApp({
 
 exports.handler = async (event, context, callback) => {
 
-	const room = admin.firestore().collection("room").doc(event.room_num);
-
-	await room.delete()
-	.then(() => {
+	const room = admin.firestore().collection("room");
+	await room.where("room_num", '==', event.room_num).get().then((querySnapshot) => {
+		const doc = querySnapshot.docs[0];
+		doc.ref.delete();
 		callback(null, {
 			statusCode: 200,
 			message: "Room deleted successfully",
 		});
-	});
+	})
 
 };

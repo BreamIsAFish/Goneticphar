@@ -21,23 +21,26 @@ const obj = async (imagePath) => {
 
 exports.handler = async (event, context, callback) => {
 
-	const room = admin.firestore().collection("room").doc(event.room_num);
-	const result = await obj("Crab-body-7f9ae78.jpg");
+	const room = admin.firestore().collection("room");
+	const result = await obj("Crab-body-7f9ae78.jpg"); // example image
 
 	var current_question;
 	var score;
 	var array;
-	await room.get().then((doc) => {
+	await room.where("room_num", '==', event.room_num).get().then((querySnapshot) => {
+		const doc = querySnapshot.docs[0];
+		id = doc.data().id;
 		current_question = doc.data().current_question;
 		array = doc.data().players_score[event.player_id] || [];
 	})
 	result.forEach(obj => {
 		if (obj.name == current_question) {
-			score = obj.score;
+			score = (obj.score * 100).toFixed(2);
 		}
 	})
+	if ( score == null) score = 0;
 	array.push(score);
-	await room.update({
+	await room.doc(id).update({
 		["players_score." + event.player_id] : array
 	}).then(() => {
 		callback(null, {
