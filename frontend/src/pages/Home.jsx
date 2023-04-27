@@ -1,31 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react'
-// import { signInAnonymously } from "firebase/auth";
-// import {
-//   addDoc,
-//   collection,
-//   limit,
-//   onSnapshot,
-//   orderBy,
-//   query,
-//   serverTimestamp,
-// } from "firebase/firestore";
-
-// import { auth, db } from "../utils/firebase";
 import { useNavigate } from 'react-router-dom'
 import jwt_decode from 'jwt-decode'
 
 import { api } from '../utils/api'
-import {
-  collection,
-  getDocs,
-  limit,
-  onSnapshot,
-  query,
-  where,
-} from 'firebase/firestore'
+import { collection, getDocs, limit, query, where } from 'firebase/firestore'
 import { db } from '../utils/firebase'
 
 const Home = () => {
+  const [pageState, setPageState] = useState('normal') // normal, creating, joining
   const roomIdRef = useRef('')
   const navigate = useNavigate()
 
@@ -58,7 +40,8 @@ const Home = () => {
       return
     }
 
-    // const player_id = getTokenInfo().sub;
+    setPageState('joining')
+
     const player_username = getTokenInfo()['cognito:username']
     const room_num = roomIdRef.current.value
 
@@ -72,6 +55,7 @@ const Home = () => {
     // If room is not exist
     if (querySnapshot.empty) {
       alert(`Room ${room_num} is not exist`)
+      setPageState('normal')
       return
     }
 
@@ -80,6 +64,7 @@ const Home = () => {
     // if (room?.players && room?.players.includes(player_id)) {
     if (room?.players && room?.players.includes(player_username)) {
       navigate(`/room/${room_num}/lobby`)
+      setPageState('normal')
       return
     }
 
@@ -94,16 +79,18 @@ const Home = () => {
       .then(({ data }) => {
         console.log(data)
         navigate(`/room/${room_num}/lobby`)
+        setPageState('normal')
       })
       .catch((err) => {
         console.log(err)
+        setPageState('normal')
       })
   }
 
   const createRoom = async () => {
-    // const player_id = getTokenInfo().sub;
-    const player_username = getTokenInfo()['cognito:username']
+    setPageState('creating')
 
+    const player_username = getTokenInfo()['cognito:username']
     await api({
       method: 'POST',
       url: '/room/createRoom',
@@ -115,9 +102,11 @@ const Home = () => {
       .then(async ({ data }) => {
         console.log(data)
         if (data?.room_num) navigate(`/room/${data.room_num}/lobby`)
+        setPageState('normal')
       })
       .catch((err) => {
         console.log(err)
+        setPageState('normal')
       })
   }
 
@@ -127,7 +116,7 @@ const Home = () => {
   }
 
   return (
-    <div className="flex flex-col justify-center items-center mx-auto my-20">
+    <div className="flex flex-col items-center h-screen w-screen mx-auto py-20 bg-fixed bg-cover bg-mountain">
       <div className="absolute right-4 top-4">
         <button
           className="text-sm font-medium text-white px-4 py-2 rounded-xl bg-black"
@@ -137,32 +126,36 @@ const Home = () => {
         </button>
       </div>
 
-      <h1 className="text-3xl font-bold text-pink-500">
-        Welcome to Goneticphar
+      <h1 className="text-3xl font-bold font-nordic text-center leading-loose text-white my-12">
+        Welcome to
+        <p className="text-5xl">Goneticphar</p>
       </h1>
 
       <div className="flex flex-col justify-center items-center w-full my-8">
-        <h3 className="text-xl font-semibold mb-2">Enter Room ID</h3>
+        <h3 className="text-xl font-semibold font-aqua mb-2">Enter Room ID</h3>
         <input
           type="number"
-          maxLength={6}
+          maxLength="6"
           ref={roomIdRef}
-          className="border w-1/5 px-4 py-2"
+          className="text-center font-aqua border w-1/5 px-4 py-2 rounded-full outline-none"
         />
       </div>
 
       <div className="flex flex-col ">
         <button
           onClick={joinRoom}
-          className="font-bold p-4 w-96 border-2 rounded-xl"
+          disabled={pageState !== 'normal'}
+          className={`font-bold py-3 mt-4 w-60 rounded-full bg-purple-700 text-white shadow-2xl`}
         >
-          Join Room
+          {pageState === 'joining' ? 'Joining...' : ' Join Room'}
         </button>
+
         <button
           onClick={createRoom}
-          className="font-bold p-4 mt-4 w-96 border-2 rounded-xl"
+          disabled={pageState !== 'normal'}
+          className={`font-bold py-3 mt-4 w-60 rounded-full border border-white text-white shadow-2xl`}
         >
-          Create Room
+          {pageState === 'creating' ? 'Creating...' : ' Create Room'}
         </button>
       </div>
     </div>

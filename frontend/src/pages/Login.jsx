@@ -1,13 +1,8 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import {
-  Visibility,
-  VisibilityOff,
-  VoicemailOutlined,
-} from '@mui/icons-material'
+import { Visibility, VisibilityOff, AccountBox } from '@mui/icons-material'
 
 import { api } from '../utils/api'
-import { EmailOutlined } from '@mui/icons-material'
 
 const Login = () => {
   const [username, setUsername] = useState('')
@@ -66,7 +61,7 @@ const Login = () => {
       </h1>
 
       {/* Login Form */}
-      <div className="flex flex-col p-16 mt-16 border bg-white bg-opacity-20 border-white rounded-3xl shadow-xl">
+      <div className="flex flex-col p-16 mt-16 border bg-white bg-opacity-10 border-white rounded-3xl shadow-2xl">
         {/* Username Field */}
         <h3 className="text-xl font-semibold font-aqua text-white mb-2">
           Username
@@ -78,7 +73,7 @@ const Login = () => {
             onChange={(e) => setUsername(e.target.value)}
             className="text-lg font-medium font-aqua text-white w-full px-4 py-2 bg-transparent outline-none"
           />
-          <EmailOutlined color="action" />
+          <AccountBox color="action" />
         </div>
 
         {/* Password Field */}
