@@ -31,7 +31,6 @@ export const CanvasProvider = ({ children }) => {
   }
 
   const finishDrawing = () => {
-    contextRef.current.closePath()
     setIsDrawing(false)
   }
 
@@ -51,35 +50,46 @@ export const CanvasProvider = ({ children }) => {
     context.fillRect(0, 0, canvas.width, canvas.height)
   }
 
-  const submitQuestion = (roomNum, currentQuestion) => {
+  const getBase64Data = () => {
+    const canvas = canvasRef.current
+    const dataURL = canvas.toDataURL('image/png')
+    const base64Data = dataURL.replace(/^data:image\/png;base64,/, '')
+    return base64Data
+  }
+
+  const submitQuestion = (roomNum, currentQuestion, playerUsername) => {
+    finishDrawing()
+
     const canvas = canvasRef.current
     const dataURL = canvas.toDataURL('image/png')
     const base64Data = dataURL.replace(/^data:image\/png;base64,/, '')
     // console.log(base64Data)
     const req = {
       room_num: roomNum,
-      image_data: base64Data,
+      player_id: playerUsername,
+      imageData: base64Data,
       current_question: currentQuestion,
     }
 
     // Mock API
     console.log(new Date(), 'submitQuestion called...')
-    setTimeout(() => {
-      console.log(new Date(), 'submitted...', req)
-      clearCanvas()
-    }, 100)
-    /*
+    // setTimeout(() => {
+    //   clearCanvas()
+    // }, 100)
     api
       .post('/submitQuestion', req)
       .then((data) => {
+        console.log(new Date(), 'submitted...', req)
         console.log(data)
-        clearCanvas()
+        // clearCanvas()
       })
       .catch((err) => {
+        console.log(new Date(), 'submitted...', req)
         console.log(err)
-        clearCanvas()
+        // clearCanvas()
       })
-      */
+
+    clearCanvas()
   }
 
   return (
@@ -92,6 +102,7 @@ export const CanvasProvider = ({ children }) => {
         finishDrawing,
         clearCanvas,
         draw,
+        getBase64Data,
         submitQuestion,
       }}
     >

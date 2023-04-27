@@ -12,6 +12,7 @@ import Home from './pages/Home'
 import Lobby from './pages/Lobby'
 import Game from './pages/Game'
 import ChatTest from './pages/ChatTest'
+import Scoreboard from './pages/Scoreboard'
 
 function App() {
   return (
@@ -41,7 +42,10 @@ function App() {
             path="/room/:room_num/game"
             element={<Game />}
           />
-          {/* <Route path="/room/:id/scoreboard" element={...} /> */}
+          <Route
+            path="/room/:room_num/scoreboard"
+            element={<Scoreboard />}
+          />
         </Route>
         {/* Default Route */}
         <Route

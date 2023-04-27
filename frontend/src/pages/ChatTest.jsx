@@ -36,7 +36,7 @@ const ChatTest = () => {
       })
       setMessages(messages)
     })
-    return () => unsubscribe
+    return unsubscribe
   }, [])
 
   const testAsync = () => {

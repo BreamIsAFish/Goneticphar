@@ -30,7 +30,7 @@ const ChatBox = ({ senderUsername, roomNum }) => {
       })
       setMessages(messages)
     })
-    return () => unsubscribe
+    return unsubscribe
   }, [])
 
   // Send New Messages //
