@@ -121,8 +121,22 @@ const Home = () => {
       })
   }
 
+  const logout = () => {
+    localStorage.removeItem('token')
+    navigate('/login')
+  }
+
   return (
     <div className="flex flex-col justify-center items-center mx-auto my-20">
+      <div className="absolute right-4 top-4">
+        <button
+          className="text-sm font-medium text-white px-4 py-2 rounded-xl bg-black"
+          onClick={logout}
+        >
+          Logout
+        </button>
+      </div>
+
       <h1 className="text-3xl font-bold text-pink-500">
         Welcome to Goneticphar
       </h1>
