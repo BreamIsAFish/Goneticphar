@@ -23,19 +23,40 @@ const Register = () => {
     }
     await api
       .post('/user/signup', req)
-      .then(() => {
-        // console.log(data);
-        navigate('/login')
-        setLoading(false)
+      .then(async () => {
+        // navigate('/login')
+        await login(username, password)
       })
       .catch((err) => {
+        alert('Username already exists')
         console.log(err)
         setLoading(false)
       })
   }
 
-  const login = () => {
-    navigate('/login')
+  const login = async (username, password) => {
+    const req = {
+      username,
+      password,
+    }
+    await api
+      .post('/user/signin', req)
+      .then(({ data }) => {
+        console.log(data)
+        localStorage.setItem('token', data.idToken)
+        navigate('/home')
+        setLoading(false)
+      })
+      .catch((err) => {
+        setLoading(false)
+        if (
+          err?.response?.status === 401 &&
+          err?.response?.data?.err?.code === 'NotAuthorizedException'
+        ) {
+          alert('Invalid username or password')
+        }
+        console.log(err?.response)
+      })
   }
 
   const isInputValid = () => {
@@ -128,7 +149,7 @@ const Register = () => {
             {isLoading ? 'Loading...' : 'Register'}
           </button>
           <p
-            onClick={login}
+            onClick={() => navigate('/login')}
             className="flex text-base font-aqua font-bold text-white mt-8 underline cursor-pointer"
           >
             Already have an account
