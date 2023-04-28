@@ -72,7 +72,7 @@ const ChatBox = ({ senderUsername, roomNum }) => {
   }
 
   return (
-    <div className="flex flex-col justify-end w-full h-full p-3 pb-12 border border-pink-600 rounded-xl bg-white overflow-hidden relative">
+    <div className="flex flex-col justify-end w-full h-full p-3 pb-12 rounded-xl bg-white overflow-hidden relative">
       {messages.map((message, idx) => (
         <div key={idx}>
           <span

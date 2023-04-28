@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react'
-
-import { Canvas } from '../components/Canvas'
-import { useCanvas } from '../context/CanvasContext'
 import { collection, limit, onSnapshot, query, where } from 'firebase/firestore'
-import { db } from '../utils/firebase'
 import { useNavigate, useParams } from 'react-router-dom'
 import jwt_decode from 'jwt-decode'
+import { Create, Delete } from '@mui/icons-material'
+
+import { db } from '../utils/firebase'
+import { Canvas } from '../components/Canvas'
+import { useCanvas } from '../context/CanvasContext'
 import ChatBox from '../components/ChatBox'
 
 const Game = () => {
@@ -25,13 +26,9 @@ const Game = () => {
 
   const timePerQuestion = 20
   const tools = [
-    { name: 'Pen', onClick: () => {} },
-    { name: 'Clear', onClick: clearCanvas },
+    { id: 1, iconElement: <Create />, onClick: () => {} },
+    { id: 2, iconElement: <Delete />, onClick: clearCanvas },
   ]
-
-  useEffect(() => {
-    console.log(gameStartedRef.current)
-  }, [gameStartedRef.current])
 
   // Check if token is valid
   useEffect(() => {
@@ -58,11 +55,10 @@ const Game = () => {
 
         const room = querySnapshot.docs[0].data()
         console.log('room', room)
-        // setRoomInfo(room)
         setPlayers(room?.players ?? [])
 
         // Check if player is in this room
-        const player_username = getTokenInfo()['cognito:username']
+        const player_username = getTokenInfo()?.['cognito:username']
         if (!room.players.includes(player_username)) {
           console.log('Player is not in this room')
           navigate('/home')
@@ -159,7 +155,7 @@ const Game = () => {
         submitQuestion(
           room_num,
           currentQuestionRef.current,
-          getTokenInfo()['cognito:username']
+          getTokenInfo()?.['cognito:username']
         )
       }
       currentQuestionRef.current = room.current_question
@@ -172,11 +168,10 @@ const Game = () => {
         submitQuestion(
           room_num,
           currentQuestionRef.current,
-          getTokenInfo()['cognito:username']
+          getTokenInfo()?.['cognito:username']
         )
       }
       setTimeout(() => {
-        console.log(new Date(), 'navigating to scoreboard...')
         navigate(`/room/${room_num}/scoreboard`)
       }, 200)
     }
@@ -192,67 +187,75 @@ const Game = () => {
 
   const getTokenInfo = () => {
     const token = localStorage.getItem('token')
-    if (!token) navigate('/login')
+    if (!token) {
+      navigate('/login')
+      return
+    }
     return jwt_decode(token)
   }
 
   return (
-    <div className="flex flex-col px-24 py-10 w-screen min-h-screen bg-pink-800">
+    <div className="flex flex-col px-24 py-10 w-screen min-h-screen bg-mountain bg-cover">
       {/* Top Section (Icon & QuestionWord & Timer) */}
       <div className="flex pl-8 justify-between items-center">
         <h1 className="text-3xl font-bold text-white">Goneticphar</h1>
         <div className="flex px-4 py-2 border-2 rounded-xl">
-          <h className="text-xl font-semibold text-white">{`${timer} s`}</h>
-        </div>
-      </div>
-      {/* Middle Section (PlayersBar & DrawBoard) */}
-      <div className="flex my-4 w-full h-fit justify-between">
-        {/* PlayersBar */}
-        <div className="flex flex-col items-center p-3 mr-5 w-[20vw] h-[525px] rounded-xl bg-white">
-          {players.map((player, idx) => (
-            <div
-              key={idx}
-              className="flex items-center justify-center w-full px-4 py-3 mb-3 rounded-xl bg-blue-500"
-            >
-              <span className="text-md font-semibold text-white">
-                {player.slice(0, 10)}
-              </span>
-            </div>
-          ))}
-        </div>
-        {/* DrawBoard */}
-        <div className="flex rounded-xl w-[80vw] relative overflow-hidden">
-          <Canvas />
-          <div className="flex flex-row justify-center items-center px-6 py-2 rounded-br-2xl absolute top-0 bg-indigo-600">
-            <p className="text-lg font-semibold text-white">
-              {`Round ${currentQuestionNumRef.current} : `}
-            </p>
-            <p className="text-2xl font-bold ml-2 text-yellow-400">
-              {currentQuestionRef.current}
-            </p>
-          </div>
-          {/* Tools */}
-          <div className="flex flex-col items-center p-4 h-full bg-slate-400 right-0 absolute">
-            {tools.map((tool, idx) => (
-              <div
-                key={idx}
-                onClick={tool.onClick}
-                className="my-4"
-              >
-                {tool.name}
-              </div>
-            ))}
-          </div>
+          <h1 className="text-xl font-semibold text-white">{`${timer} s`}</h1>
         </div>
       </div>
 
-      {/* Bottom Section (Chat etc.) */}
-      {/* Chat box */}
-      <div className="flex w-full h-[30vh]">
-        <ChatBox
-          senderUsername={getTokenInfo()['cognito:username']}
-          roomNum={room_num}
-        />
+      <div className="flex flex-col w-min">
+        {/* Middle Section (PlayersBar & DrawBoard) */}
+        <div className="flex my-4 w-fit h-fit justify-center">
+          {/* PlayersBar */}
+          <div className="flex flex-col items-center p-3 mr-5 w-[20vw] h-[525px] rounded-xl bg-white">
+            {players.map((player, idx) => (
+              <div
+                key={idx}
+                className="flex items-center justify-center w-full px-4 py-3 mb-3 rounded-xl bg-blue-500"
+              >
+                <span className="text-md font-semibold text-white">
+                  {player.slice(0, 10)}
+                </span>
+              </div>
+            ))}
+          </div>
+          {/* DrawBoard */}
+          <div className="flex rounded-xl overflow-hidden relative">
+            <Canvas />
+            <div className="flex flex-row justify-center items-center px-6 py-2 rounded-br-2xl absolute top-0 bg-indigo-600">
+              <p className="text-lg font-semibold text-white">
+                {`Round ${currentQuestionNumRef.current} : `}
+              </p>
+              <p className="text-2xl font-bold ml-2 text-yellow-400">
+                {currentQuestionRef.current}
+              </p>
+            </div>
+            {/* Tools */}
+            <div className="flex flex-col items-center p-4 h-full bg-pink-500 right-0 absolute">
+              {tools.map((tool) => (
+                <div
+                  key={tool.id}
+                  onClick={tool.onClick}
+                  className={`my-4 ${
+                    tool.id === 1 ? 'text-black' : 'text-white'
+                  }`}
+                >
+                  {tool.iconElement}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Section (Chat etc.) */}
+        {/* Chat box */}
+        <div className="flex w-full h-[30vh]">
+          <ChatBox
+            senderUsername={getTokenInfo()?.['cognito:username']}
+            roomNum={room_num}
+          />
+        </div>
       </div>
     </div>
   )

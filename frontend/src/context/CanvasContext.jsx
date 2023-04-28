@@ -63,7 +63,6 @@ export const CanvasProvider = ({ children }) => {
     const canvas = canvasRef.current
     const dataURL = canvas.toDataURL('image/png')
     const base64Data = dataURL.replace(/^data:image\/png;base64,/, '')
-    // console.log(base64Data)
     const req = {
       room_num: roomNum,
       player_id: playerUsername,
@@ -71,22 +70,15 @@ export const CanvasProvider = ({ children }) => {
       current_question: currentQuestion,
     }
 
-    // Mock API
-    console.log(new Date(), 'submitQuestion called...')
-    // setTimeout(() => {
-    //   clearCanvas()
-    // }, 100)
     api
       .post('/submitQuestion', req)
       .then((data) => {
-        console.log(new Date(), 'submitted...', req)
+        // console.log(new Date(), 'submitted...', req)
         console.log(data)
-        // clearCanvas()
       })
       .catch((err) => {
-        console.log(new Date(), 'submitted...', req)
+        // console.log(new Date(), 'submitted...', req)
         console.log(err)
-        // clearCanvas()
       })
 
     clearCanvas()

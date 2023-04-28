@@ -1,5 +1,4 @@
 import {
-  addDoc,
   collection,
   doc,
   getDocs,
@@ -18,12 +17,11 @@ import { db } from '../utils/firebase'
 import ChatBox from '../components/ChatBox'
 
 const Lobby = () => {
-  // const [messages, setMessages] = useState([])
   const [players, setPlayers] = useState([])
   const [roomInfo, setRoomInfo] = useState()
   const isHostRef = useRef(false)
+  const [countDown, setCountDown] = useState(0)
 
-  // const chatInputRef = useRef('')
   const navigate = useNavigate()
   const { room_num } = useParams()
 
@@ -68,6 +66,8 @@ const Lobby = () => {
 
         if (room.room_status === 'playing') {
           navigate(`/room/${room_num}/game`)
+        } else if (room.room_status === 'starting') {
+          showStartGameCountdown()
         }
 
         isHostRef.current = room.host === player_username
@@ -79,6 +79,19 @@ const Lobby = () => {
     return unsubscribe
   }, [])
 
+  const showStartGameCountdown = () => {
+    let count = 5
+    setCountDown(count)
+    const interval = setInterval(() => {
+      count--
+      setCountDown(count)
+      if (count <= 0) {
+        clearInterval(interval)
+        startGame()
+      }
+    }, 1000)
+  }
+
   const getTokenInfo = () => {
     const token = localStorage.getItem('token')
     if (!token) {
@@ -88,11 +101,13 @@ const Lobby = () => {
     return jwt_decode(token)
   }
 
-  const startGame = async () => {
+  const onClickStartGame = async () => {
     if (players.length < 2) return
 
-    await clearRoomScore()
+    await resetRoomData()
+  }
 
+  const startGame = async () => {
     api({
       method: 'POST',
       url: '/room/startRoom',
@@ -167,7 +182,6 @@ const Lobby = () => {
       }
 
       console.log('exiting room...')
-      // const player_id = getTokenInfo().sub
       const player_username = getTokenInfo()?.['cognito:username']
       api({
         method: 'PUT',
@@ -187,18 +201,17 @@ const Lobby = () => {
     navigate('home')
   }
 
-  const clearRoomScore = async () => {
+  const resetRoomData = async () => {
     const q = query(collection(db, 'room'), where('room_num', '==', room_num))
     const findRoom = await getDocs(q)
     const room = findRoom.docs[0].data()
     const roomRef = doc(db, 'room', room.id)
     await updateDoc(roomRef, {
       players_score: {},
-      room_status: 'waiting',
-      current_question: room.question_list[0],
+      room_status: 'starting',
     })
       .then(() => {
-        console.log('Room score has been cleared')
+        console.log('Room data has been cleared')
       })
       .catch((error) => {
         console.log(error)
@@ -206,7 +219,7 @@ const Lobby = () => {
   }
 
   return (
-    <div className="flex flex-col w-screen min-h-screen p-12 bg-pink-800">
+    <div className="flex flex-col w-screen min-h-screen p-12 bg-mountain bg-cover relative">
       <div className="flex justify-between mb-4">
         <div className="flex items-center">
           <button
@@ -223,9 +236,19 @@ const Lobby = () => {
       <div className="grid grid-rows-4 grid-flow-col gap-4">
         {/* Left Section (Room info & Chat box) */}
         {/* Room info */}
-        <div className="row-span-1 col-span-1 p-3 min-h-[20vh] border border-pink-200 rounded-xl bg-white">
-          <h3 className="text-lg font-semibold">{`Room: ${room_num}`}</h3>
-          <h3 className="text-lg font-semibold">{`Max player: 5`}</h3>
+        <div className="row-span-1 col-span-1 p-6 min-h-[20vh] rounded-xl bg-white">
+          <h3 className="text-lg font-semibold">
+            Room:
+            <span className="text-indigo-600 ml-2">{room_num}</span>
+          </h3>
+          <h3 className="text-lg font-semibold">
+            Max player:
+            <span className="text-indigo-600 ml-2">{roomInfo?.max_player}</span>
+          </h3>
+          <h3 className="text-lg font-semibold">
+            Host:
+            <span className="text-indigo-600 ml-2">{roomInfo?.host}</span>
+          </h3>
         </div>
 
         {/* Chat box */}
@@ -238,33 +261,53 @@ const Lobby = () => {
 
         {/* Right Section (Player list) */}
         <div className="flex flex-col justify-end row-span-4 col-span-5">
-          <div className="h-full p-8 border border-pink-200 rounded-lg bg-white">
+          <div className="h-full p-8 rounded-lg bg-white">
             <h3 className="text-2xl font-bold mb-8">Players</h3>
             {players.map((player, idx) => (
               <div
                 key={player}
                 className="flex items-center mb-6"
               >
-                <h3 className="flex justify-center text-xl font-bold p-2 mr-4 rounded-xl bg-blue-400 text-white">
+                <h3
+                  className={`flex justify-center text-xl font-bold p-2 mr-4 rounded-xl ${
+                    roomInfo.host === player ? 'bg-yellow-500' : 'bg-blue-400'
+                  } text-white`}
+                >
                   {`Player ${idx + 1}`}
                 </h3>
-                <h3 className="text-xl font-semibold">{player}</h3>
+                <h3 className="text-xl font-semibold">{`${player} ${
+                  roomInfo.host === player ? '(Host)' : ''
+                }`}</h3>
               </div>
             ))}
           </div>
           <button
-            onClick={startGame}
+            onClick={onClickStartGame}
             disabled={players.length < 2 || !isHostRef.current}
             className={`font-semibold text-white h-16 mt-4 rounded-xl ${
-              players.length < 2 ? 'bg-gray-400' : 'bg-indigo-400'
+              isHostRef.current && players.length >= 2
+                ? 'bg-indigo-400'
+                : 'bg-gray-400'
             } shadow-xl`}
           >
             {isHostRef.current
               ? 'Start Game'
-              : 'Waiting for Host to start game'}
+              : 'Waiting for host to start game'}
           </button>
         </div>
       </div>
+
+      {/* Count Down Modal */}
+      {countDown && (
+        <div className="flex flex-col justify-center items-center w-screen h-screen bg-black/50 absolute top-0 left-0">
+          <h1
+            className="text-[30vw] font-bold font-nordic text-pink-600"
+            style={{ WebkitTextStroke: '2px black' }}
+          >
+            {countDown}
+          </h1>
+        </div>
+      )}
     </div>
   )
 }
