@@ -60,11 +60,9 @@ const Scoreboard = () => {
 
         const room = querySnapshot.docs[0].data()
         console.log('room', room)
-        // setRoomInfo(room)
         setPlayers(room?.players ?? [])
 
         // Check if player is in this room
-        // const player_id = getTokenInfo().sub
         const player_username = getTokenInfo()?.['cognito:username']
         if (!room.players.includes(player_username)) {
           console.log('Player is not in this room')
@@ -208,7 +206,7 @@ const Scoreboard = () => {
   }
 
   return (
-    <div className="flex flex-col px-20 py-10 w-screen min-h-screen bg-pink-800 relative">
+    <div className="flex flex-col px-20 py-10 w-screen min-h-screen bg-mountain bg-cover relative">
       {/* Top Section (Icon & QuestionWord & Timer) */}
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold text-white">Goneticphar</h1>
@@ -286,7 +284,7 @@ const Scoreboard = () => {
                       ) : (
                         // Scores
                         <p className="text-base font-semibold text-gray-700">
-                          {data}
+                          {parseInt(data) ?? 0}
                         </p>
                       )}
                     </div>
@@ -299,7 +297,7 @@ const Scoreboard = () => {
       </div>
 
       {/* Footer Section */}
-      <div>
+      <div className="flex justify-end w-full">
         <button
           onClick={exitRoom}
           className="text-lg font-bold text-white px-4 py-3 mr-8 rounded-xl bg-red-400 shadow-xl"
@@ -308,7 +306,7 @@ const Scoreboard = () => {
         </button>
         <button
           onClick={playAgain}
-          className="text-lg font-bold text-white px-4 py-3 mr-8 rounded-xl bg-indigo-500 shadow-xl"
+          className="text-lg font-bold text-white px-4 py-3 rounded-xl bg-indigo-500 shadow-xl"
         >
           Play Again
         </button>
