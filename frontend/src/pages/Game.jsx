@@ -23,7 +23,7 @@ const Game = () => {
   const { room_num } = useParams()
   const { clearCanvas, submitQuestion } = useCanvas()
 
-  const timePerQuestion = 10
+  const timePerQuestion = 20
   const tools = [
     { name: 'Pen', onClick: () => {} },
     { name: 'Clear', onClick: clearCanvas },
