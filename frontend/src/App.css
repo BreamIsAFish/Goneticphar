@@ -36,3 +36,15 @@
     transform: rotate(360deg);
   }
 }
+
+@font-face {
+  font-family: 'Aqua';
+  src: local('Aqua'), url('./fonts/Aqua.ttf') format('truetype');
+  font-weight: normal;
+}
+
+@font-face {
+  font-family: 'Nordic';
+  src: local('Nordic'), url('./fonts/Nordic.ttf') format('truetype');
+  font-weight: normal;
+}
