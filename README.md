@@ -1,6 +1,6 @@
 # Goneticphar
 
-### Table of contents
+## Table of contents
 
 - [Set up & Deploy](#set-up-&-deploy)
   - [Frontend](#frontend)
@@ -13,9 +13,9 @@
 
 ---
 
-### Set up & deploy
+## Set up & deploy
 
-#### Frontend
+### Frontend
 
 Frontend is deployed using AWS Amplify using the following steps:
 
@@ -29,9 +29,9 @@ Frontend is deployed using AWS Amplify using the following steps:
 
    ***
 
-#### Backend
+### Backend
 
-##### Set up Lambda
+#### Set up Lambda
 
 1. ไปที่ service Lambda > Create function จากนั้นตั้งแต่ function และเลือกภาษา ในที่นี้ใช้ Node.js 18.x แล้วกด Create function
 2. Upload code ของแต่ละ function โดยไปที่ Upload from > .zip file > เลือกไฟล์ที่ต้องการ > Upload > Save
@@ -49,7 +49,7 @@ Frontend is deployed using AWS Amplify using the following steps:
 
 <br/>
 
-##### Set up Cognito
+#### Set up Cognito
 
 1. ไปที่ service Cognito > Create user pool > Cognito user pool sign-in options เลือก User name > Next
 2. ตั้งค่า Password policy ตามที่ต้องการ > เลือก No MFA > Disable User account recovery > Next
@@ -60,7 +60,7 @@ Frontend is deployed using AWS Amplify using the following steps:
 
 <br/>
 
-##### Set up API Gateway
+#### Set up API Gateway
 
 1. ไปที่ service API Gateway > Create API > Build REST API > ตั้งชื่อ API > Create API
 2. ไปที่ API ที่สร้างขึ้น > Actions > Create Resource สำหรับแต่ละ Lambda function > Create Resource
@@ -79,7 +79,7 @@ You have to make this API Gateway to become `Asynchronous Invocation` by followi
 
 <br/>
 
-##### Set up Google Cloud Service
+#### Set up Google Cloud Service
 
 - **Cloud Firestore API**
   1.  ไปที่ Firebase console และ Add project
@@ -95,14 +95,14 @@ You have to make this API Gateway to become `Asynchronous Invocation` by followi
 
 ---
 
-### How to run
+## How to run
 
-#### Local (Development)
+### Local (Development)
 
 1. `cd frontend`
 2. `npm run start`
 
-#### Production
+### Production
 
 1. Go to the url that you get from AWS Amplify e.g.
    https://deploy-front.d1q2ccz8tdkfaw.amplifyapp.com/
