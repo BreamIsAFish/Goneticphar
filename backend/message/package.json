@@ -1,0 +1,7 @@
+{
+	"main": "index.js",
+	"dependencies": {
+		"@google-cloud/language": "^5.2.1",
+		"firebase-admin": "^11.6.0"
+	}
+}
