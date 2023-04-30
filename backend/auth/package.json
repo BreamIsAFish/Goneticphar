@@ -1,0 +1,7 @@
+{
+  "main": "index.js",
+  "dependencies": {
+    "amazon-cognito-identity-js": "^6.2.0",
+    "jsonwebtoken": "^9.0.0"
+  }
+}

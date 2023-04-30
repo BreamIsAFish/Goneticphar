@@ -65,7 +65,7 @@ const Game = () => {
           return
         }
 
-        if (room.room_status === 'waiting') {
+        if (room.room_status === 'starting') {
           currentQuestionNumRef.current = 0
           currentQuestionRef.current = 'Preparing to start...'
         }
