@@ -26,6 +26,8 @@ exports.handler = async (event, context, callback) => {
 	event.players_score = {};
    	event.current_question = "";
 	event.question_list = [];
+	event.all_question_list = ["Crab", "Hat", "Bird", "Sheep", "Car",
+	"Elephant", "Glasses", "Pants", "Turtle", "Table"];
 	event.current_time = date;
 	event.room_status = "waiting";
 	const res = admin.firestore().collection("room");
