@@ -20,13 +20,12 @@ const Scoreboard = () => {
   const [reset, setReset] = useState(false)
   const [players, setPlayers] = useState([])
   const [isLoading, setLoading] = useState(true)
-  const scoreRef = useRef({
-    beam: ['53', '26', '56', '94'],
-    beam2: ['53', '26', '56', '94'],
-  }) // { [player: string]: number[] }
+  const scoreRef = useRef({}) // { [player: string]: number[] }
   const isHostRef = useRef(false)
   const navigate = useNavigate()
   const { room_num } = useParams()
+
+  const maxQuestion = 5
 
   // Check if token is valid
   useEffect(() => {
@@ -78,7 +77,20 @@ const Scoreboard = () => {
         }
 
         isHostRef.current = room.host === player_username
-        scoreRef.current = room?.players_score ?? {}
+        if (room?.players_score) {
+          Object.keys(room?.players_score).map((player) => {
+            const scoreLength = room?.players_score[player].length
+            if (scoreLength < maxQuestion) {
+              const score = room?.players_score[player]
+              scoreRef.current[player] = [
+                ...Array.from(Array(maxQuestion - scoreLength)).fill(0),
+                ...score,
+              ]
+            }
+          })
+        } else {
+          scoreRef.current = {}
+        }
       },
       (err) => {
         console.log(`Encountered error: ${err}`)
