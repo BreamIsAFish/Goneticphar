@@ -206,9 +206,13 @@ const Lobby = () => {
     const findRoom = await getDocs(q)
     const room = findRoom.docs[0].data()
     const roomRef = doc(db, 'room', room.id)
+    const shuffledWords = room.all_question_list.sort(
+      (a, b) => 0.5 - Math.random()
+    )
     await updateDoc(roomRef, {
       players_score: {},
       room_status: 'starting',
+      question_list: shuffledWords.slice(0, 5),
     })
       .then(() => {
         console.log('Room data has been cleared')
