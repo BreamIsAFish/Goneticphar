@@ -212,7 +212,7 @@ const Lobby = () => {
     await updateDoc(roomRef, {
       players_score: {},
       room_status: 'starting',
-      question_list: shuffledWords.slice(4),
+      question_list: shuffledWords.slice(0, 5),
     })
       .then(() => {
         console.log('Room data has been cleared')
