@@ -80,12 +80,14 @@ const Scoreboard = () => {
         if (room?.players_score) {
           Object.keys(room?.players_score).map((player) => {
             const scoreLength = room?.players_score[player].length
+            const score = room?.players_score[player]
             if (scoreLength < maxQuestion) {
-              const score = room?.players_score[player]
               scoreRef.current[player] = [
                 ...Array.from(Array(maxQuestion - scoreLength)).fill(0),
                 ...score,
               ]
+            } else {
+              scoreRef.current[player] = score
             }
           })
         } else {
