@@ -96,7 +96,7 @@ const Home = () => {
       url: '/room/createRoom',
       data: {
         host: player_username,
-        max_player: 10,
+        max_player: 4,
       },
     })
       .then(async ({ data }) => {
