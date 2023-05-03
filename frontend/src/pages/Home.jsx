@@ -78,8 +78,13 @@ const Home = () => {
     })
       .then(({ data }) => {
         console.log(data)
-        navigate(`/room/${room_num}/lobby`)
-        setPageState('normal')
+        if (data?.statusCode !== 200) {
+          alert(data?.message)
+          setPageState('normal')
+        } else {
+          navigate(`/room/${room_num}/lobby`)
+          setPageState('normal')
+        }
       })
       .catch((err) => {
         console.log(err)
