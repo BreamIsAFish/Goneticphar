@@ -10,9 +10,10 @@ admin.initializeApp({
 	credential: admin.credential.cert(serviceAccount),
 });
 
-const obj = async (imagePath) => {
+const checkScore = async (imageData) => {
 	const [result] = await client.annotateImage({
-		image: { source: { filename: imagePath}},
+		// image: { source: { filename: imagePath}},
+		image: { content: imageData },
 		features: [{ type: 'OBJECT_LOCALIZATION', maxResults: 10 }]
 	});
 	const objects = result.localizedObjectAnnotations;
@@ -22,32 +23,39 @@ const obj = async (imagePath) => {
 exports.handler = async (event, context, callback) => {
 
 	const room = admin.firestore().collection("room");
-	const result = await obj("Crab-body-7f9ae78.jpg"); // example image
 
-	var current_question;
-	var score;
-	var array;
+	const decodedImageData = Buffer.from(event.imageData, 'base64');
+	const result = await checkScore(decodedImageData);
+
+	var score, array, index;
 	await room.where("room_num", '==', event.room_num).get().then((querySnapshot) => {
 		const doc = querySnapshot.docs[0];
 		id = doc.data().id;
-		current_question = doc.data().current_question;
 		array = doc.data().players_score[event.player_id] || [];
+        index = doc.data().question_list.indexOf(event.current_question);
 	})
 	result.forEach(obj => {
-		if (obj.name == current_question) {
+		if (obj.name == event.current_question) {
 			score = (obj.score * 100).toFixed(2);
 		}
 	})
 	if ( score == null) score = 0;
-	array.push(score);
-	await room.doc(id).update({
-		["players_score." + event.player_id] : array
-	}).then(() => {
+	if (index < array.length) {
 		callback(null, {
-			statusCode: 200,
-			message: "submission successfully",
-			score: score
+			statusCode: 400,
+			message: "This question has already been submitted",
 		});
-	});
+	} else {
+		array.push(score);
+		await room.doc(id).update({
+			["players_score." + event.player_id] : array
+		}).then(() => {
+			callback(null, {
+				statusCode: 200,
+				message: "submission successfully",
+				score: score
+			});
+		});
+	}
 
 };
