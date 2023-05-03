@@ -195,9 +195,9 @@ const Game = () => {
   }
 
   return (
-    <div className="flex flex-col px-24 py-10 w-screen min-h-screen bg-mountain bg-cover">
+    <div className="flex flex-col items-center px-24 py-10 w-screen min-h-screen bg-mountain bg-cover">
       {/* Top Section (Icon & QuestionWord & Timer) */}
-      <div className="flex pl-8 justify-between items-center">
+      <div className="flex pl-8 w-10/12 justify-between items-center">
         <h1 className="text-3xl font-bold text-white">Goneticphar</h1>
         <div className="flex px-4 py-2 border-2 rounded-xl">
           <h1 className="text-xl font-semibold text-white">{`${timer} s`}</h1>
