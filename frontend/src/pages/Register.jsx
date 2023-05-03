@@ -14,6 +14,11 @@ const Register = () => {
   const navigate = useNavigate()
 
   const register = async () => {
+    if (password.trim().length < 8) {
+      alert('Password must have at least 8 characters')
+      return
+    }
+
     setLoading(true)
 
     const req = {
