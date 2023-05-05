@@ -27,7 +27,9 @@ Frontend is deployed using AWS Amplify using the following steps:
 6. In Advanced setting, add environment `REACT_APP_API_BASE_URL` with value `${YOUR_API_GATEWAY_URL}`
 7. Click `Save and deploy`
 
-   ***
+![](/Assets/amplify.png)
+
+---
 
 ### Backend
 
@@ -38,14 +40,16 @@ Frontend is deployed using AWS Amplify using the following steps:
    ( แต่ละ sub-folder ใน folder backend คือ 1 Lambda function )
    ( **_ตารางด้านล่าง_** จะบอกสิ่งที่ต้องทำ ก่อนที่จะ zip file เพื่อนำไป upload ใน Lambda )
 
-| File Location (in GitHub)                                                                                            | What you need to do before zip                                                                                        |
-| -------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| /backend/auth/                                                                                                       | 1. In index.js, fill `UserPoolId`, `ClientId` <br /> 2. Run `npm i` <br /> 3. Zip all files & Upload                  |
-| /backend/message/                                                                                                    | 1. Run `npm i` <br /> 2. Fill `naturalLanguageKey.json` and `serviceAccountKey.json` <br /> 3. Zip all files & Upload |
-| /backend/room/closeRoom <br /> /backend/room/createRoom <br /> /backend/room/joinRoom <br /> /backend/room/leaveRoom | 1. Run `npm i` <br /> 2. Fill `serviceAccountKey.json` <br /> 3. Zip all files & Upload                               |
-| /backend/submit_question                                                                                             | 1. Run `npm i` <br /> 2. Fill `googleVisionKey.json` and `serviceAccountKey.json` <br /> 3. Zip all files & Upload    |
+| File Location (in GitHub)                                                                                                                           | What you need to do before zip                                                                                        |
+| --------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| /backend/auth/                                                                                                                                      | 1. In index.js, fill `UserPoolId`, `ClientId` <br /> 2. Run `npm i` <br /> 3. Zip all files & Upload                  |
+| /backend/message/                                                                                                                                   | 1. Run `npm i` <br /> 2. Fill `naturalLanguageKey.json` and `serviceAccountKey.json` <br /> 3. Zip all files & Upload |
+| /backend/room/closeRoom <br /> /backend/room/createRoom <br /> /backend/room/joinRoom <br /> /backend/room/leaveRoom <br /> /backend/room/startRoom | 1. Run `npm i` <br /> 2. Fill `serviceAccountKey.json` <br /> 3. Zip all files & Upload                               |
+| /backend/submit_question                                                                                                                            | 1. Run `npm i` <br /> 2. Fill `googleVisionKey.json` and `serviceAccountKey.json` <br /> 3. Zip all files & Upload    |
 
 3. หาก function นั้น เกิด Timeout ให้ไปที่ Configuration tab > Edit > เปลี่ยน Timeout เป็น 1 min > Save
+
+![AWS Lambda Console](/Assets/lambda.png)
 
 <br/>
 
@@ -58,6 +62,8 @@ Frontend is deployed using AWS Amplify using the following steps:
 5. ตั้งชื่อ User pool > ในหัวข้อ Initial app client เลือก Confidential client และตั้งชื่อ App client > Next > Create user pool
 6. เลือก User pool ที่สร้าง > User pool properties tab > Add Lambda trigger > Pre sign-up trigger > สร้าง Lambda function สำหรับ Auto verified email ดังภาพ
 
+![AWS Cognito ](/Assets/cognito.png)
+
 <br/>
 
 #### Set up API Gateway
@@ -68,6 +74,8 @@ Frontend is deployed using AWS Amplify using the following steps:
 4. เลือก Resource > Actions > Enable CORS > ตั้งค่าดังภาพ และใส่ 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,token' ลงใน Access-Control-Allow-Headers > Enable Cors
 5. สร้าง Authorizer > เลือก Cognito type > เลือก User pool > ตั้งชื่อ Token Source สำหรับเก็บ Token ใน API Header (ในที่นี้ชื่อ ‘token’)
 6. สำหรับ API ที่ต้องการใช้ token ให้เพิ่ม Authorizer ที่สร้างขึ้น ใน Method Request
+   ![Enable CORS for gateway](/Assets/gateway.png)
+7. Actions > Deploy API (ทำทุกครั้งที่มีการแก้ไข API Gateway)
 
 **_For API Gateway connected to Lambda Function `startRoom`_**
 You have to make this API Gateway to become `Asynchronous Invocation` by following these steps:
